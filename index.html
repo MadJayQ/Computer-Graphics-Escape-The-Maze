@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>TBD</title>
+
+    <!-- Include external libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="js/lib/gl-matrix.js"></script>
+
+    <!-- Include core game files -->
+    <script src="js/app.js"></script>
+    <script src="js/math.js"></script>
+    <script src="js/globalvars.js"></script>
+    <script src="js/steptimer.js"></script>
+    <script src="js/color.js"></script>
+    <script src="js/program.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/scene.js"></script>
+    <script src="js/model.js"></script>
+    <script src="js/assets.js"></script>
+
+    <script src="js/components/component.js"></script>
+    <script src="js/components/meshcomponent.js"></script>
+    <script src="js/components/transformcomponent.js"></script>
+    <script src="js/components/inputcomponent.js"></script>
+    <script src="js/components/physicscomponent.js"></script>
+
+    <script src="js/entities/entity.js"></script>
+    <script src="js/entities/camera.js"></script>
+    <script src="js/entities/gameworld.js"></script>
+    <script src="js/entities/tree.js"></script>
+    <script src="js/entities/player.js"></script>
+    <script src="js/entities/rock.js"></script>
+    <script src="js/entities/coin.js"></script>
+    <script src="js/entities/wall.js"></script>
+
+    <!-- Include js mesh files -->
+    <script src="js/meshes/test.js"></script>
+    <script src="js/meshes/coin.js"></script>
+    <script src="js/meshes/tree.js"></script>
+    <script src="js/meshes/rock.js"></script>
+    <script src="js/meshes/ground.js"></script>
+    <script src="js/meshes/aabb.js"></script>
+
+    <!-- Include stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <canvas id="glcanvas"></canvas>
+    <script>
+      var debug = null; //This variable exists so that we can print information about our "main class" in console without jQuery getting in our way.
+      var drawAABB = true;
+      $(document).ready(() => {
+        // Setup initial AJAX settings.
+        $.ajaxSetup({
+          cache: true,
+          async: false
+        });
+
+        // Instantiate the application.
+        var app = new App();
+
+        // Setup debug reference to app.
+        debug = app;
+
+        // Setup app and handle response.
+        switch(app.setup()) {
+          case AppStatus.STATUS_OK: app.exec(); break;
+          case AppStatus.STATUS_BAD_BROWSER: alert("Your web browser does not support WebGL!"); break;
+          default: break;
+        }
+      });
+    </script>
+  </body>
+</html>
