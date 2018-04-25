@@ -64,6 +64,30 @@ class Renderer {
             camPos[Math.Y],
             camPos[Math.Z]
         );
+        var patrolPos = gameworld.patroller.transformComponent.absOrigin;
+        this.ctx.uniform3f(
+            this.program.uniformLocation("u_patrolPos"),
+            patrolPos[Math.X],
+            patrolPos[Math.Y],
+            patrolPos[Math.Z]
+        );
+
+        this.ctx.uniform1i(
+            this.program.uniformLocation("u_pointLights"),
+            plight
+        );
+        this.ctx.uniform1i(
+            this.program.uniformLocation("u_directionalLight"),
+            dlight
+        );
+        this.ctx.uniform1i(
+            this.program.uniformLocation("u_spotLight"),
+            slight
+        );
+        this.ctx.uniform1i(
+            this.program.uniformLocation("u_fog"),
+            fog
+        );
 
         this.recursiveRender(gameworld);
         // Recursively render each mesh component.

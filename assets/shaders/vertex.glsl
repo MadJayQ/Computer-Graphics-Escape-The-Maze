@@ -57,6 +57,11 @@ varying vec3 v_normal;
 varying vec4 v_pos;
 
 
+uniform bool u_ignoreLighting;
+uniform bool u_pointLights;
+uniform bool u_spotLight;
+uniform bool u_directionalLight;
+uniform bool u_fog;
 
 void main()
 {

@@ -20,6 +20,61 @@ var TreeMesh = () => {
     var leafHeight = 0;
     var leafDepth = 0;
     var leafWidth = 1.5;
+    var normals = [
+        //front
+        0.0,  0.5,  1.0,
+        0.0,  0.5,  1.0,
+        0.0,  0.5,  1.0,
+        0.0,  0.5,  1.0,
+        
+        // Back
+        0.0,  0.5, -1.0,
+        0.0,  0.5, -1.0,
+        0.0,  0.5, -1.0,
+        0.0,  0.5, -1.0,
+        
+        // Top
+        0.0,  1.0,  0.0,
+        0.0,  1.0,  0.0,
+        0.0,  1.0,  0.0,
+        0.0,  1.0,  0.0,
+        
+        // Bottom
+        0.0, -1.0,  0.0,
+        0.0, -1.0,  0.0,
+        0.0, -1.0,  0.0,
+        0.0, -1.0,  0.0,
+        
+        // Right
+        1.0,  0.5,  0.0,
+        1.0,  0.5,  0.0,
+        1.0,  0.5,  0.0,
+        1.0,  0.5,  0.0,
+        
+        // Left
+        -1.0,  0.5,  0.0,
+        -1.0,  0.5,  0.0,
+        -1.0,  0.5,  0.0,
+        -1.0,  0.5,  0.0,
+
+        //Right Tree Side
+        1.0,  1.0,  0.0,
+        1.0,  1.0,  0.0,
+        1.0,  1.0,  0.0,
+
+        //Left Tree Side
+        -1.0,  1.0,  0.0,
+        -1.0,  1.0,  0.0,
+        -1.0,  1.0,  0.0,
+
+        0.0,  1.0,  -1.0,
+        0.0,  1.0,  -1.0,
+        0.0,  1.0,  -1.0,
+
+        0.0,  1.0,  1.0,
+        0.0,  1.0,  1.0,
+        0.0,  1.0,  1.0,
+    ]
     var vertices = [
         // Front face
         -trunkWidth, -trunkHeight,  trunkDepth,
@@ -78,6 +133,7 @@ var TreeMesh = () => {
     return {
         indices: () => { return indices; },
         vertices: () => { return vertices; },
+        normals: () => { return normals; },
         color: (portalColor) => {
             var c = [];
             for(var j = 0; j < vertices.length / 3; ++j) {

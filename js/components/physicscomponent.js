@@ -3,78 +3,28 @@ var CollisionType = {
     COLLISION_SOLID: 1,
     COLLISION_TRIGGER: 2
 };
-class AABB  {
-    constructor(owner, width, height, depth) {
-        this.owner = owner;
-        this.width = width;
-        this.height = height;
-        this.depth = depth;
-        this.offsetX = (this.width / 2);
-        this.offsetY = (this.height / 2);
-        this.offsetZ = (this.depth / 2);
-        this.mesh = AABBMesh(this.offsetX, this.offsetY, this.offsetZ);
-        this.vertices = this.mesh.vertices();
-        this.color = this.mesh.color();
-        this.indices = this.mesh.indices();
-        this.translation = vec3.fromValues(0, 0, 0);
-        this.origin = vec3.fromValues(0, 0, 0);
-    }
-
-    draw(program, gl) {
-        if(!this.model) {
-            this.model = new Model(gl, this.indices, this.vertices, this.color);
-        }
-        this.model.render(program);
-        var transform = mat4.create();
-        var finalPosition = vec3.create();
-        vec3.add(
-            finalPosition,
-            this.origin,
-            this.translation
-        );
-        mat4.fromTranslation(transform, finalPosition);
-        if(this.owner.type == EntityType.ENTITY_PLAYER) {
-            //console.log(this.origin, this.owner.transformComponent);
-        }
-        gl.uniformMatrix4fv(
-            program.uniformLocation("u_modelMatrix"),
-            false,
-            transform
-        );
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.model.idxBuffer);
-        {
-            const vertexCount = this.indices.length;
-            const type = gl.UNSIGNED_SHORT;
-            const offset = 0;
-            gl.drawElements(gl.LINE_STRIP, vertexCount, type, offset);
-        }
-    }
-    checkCollision(other) {
-        var center = this.origin;
-        var otherCenter = other.origin;
-
-        var otherMin = [otherCenter[0] - other.offsetX, otherCenter[1] - other.offsetY, otherCenter[2] - other.offsetZ];
-        var otherMax = [otherCenter[0] + other.offsetX, otherCenter[1] + other.offsetX, otherCenter[2] + other.offsetZ];
-        var min = [center[0] - this.offsetX, center[1] - this.offsetY, center[2] - this.offsetZ];
-        var max = [center[0] + this.offsetX, center[1] + this.offsetY, center[2] + this.offsetZ];
-
-        return (min[0] <= otherMax[0] && max[0] >= otherMin[0]) &&
-               (min[1] <= otherMax[1] && max[1] >= otherMin[1]) &&
-               (min[2] <= otherMax[2] && max[2] >= otherMin[2]);
-    }
-};
 class PhysicsComponent extends EntityComponent {
     constructor(owner) {
         super(ComponentID.COMPONENT_PHYSICS, owner);
 
         this.interpolateMovement = true;
-        this.velocity = vec3.fromValues(0, 0, 0);
-        this.acceleration = vec3.fromValues(0, 0, 0);
-        this.brakingAcceleration = vec3.fromValues(0, 0, 0);
-        this.angularVelocity = vec3.fromValues(0, 0, 0);
-        this.lastTransform = mat4.create();
-        this.maxSpeed = 50;
 
+        // Define linear and angular velocity.
+        this.velocity = vec3.fromValues(0, 0, 0);
+        this.angularVelocity = vec3.fromValues(0, 0, 0);
+
+        // Define linear and angular acceleration.
+        this.acceleration = vec3.fromValues(0, 0, 0);
+        this.angularAcceleration = vec3.fromValues(0, 0, 0);
+
+        // Define max linear and angular velocity for any direction.
+        this.maxVelocity = 50;
+        this.maxAngularVelocity = 50;
+
+        // Define last transform.
+        this.lastTransform = mat4.create();
+
+        // Define collision type.
         this.collisionType = CollisionType.COLLISION_NONE;
     }
 
@@ -97,17 +47,39 @@ class PhysicsComponent extends EntityComponent {
                 transformComponent.localTransform
             );
         }
-        
-        var speed = vec3.length(this.velocity);
+
+        // Get current linear velocity.
+        var velocity = vec3.length(this.velocity);
+
+        // Increase velocity by acceleration.
         vec3.scaleAndAdd(
             this.velocity,
             this.velocity,
             this.acceleration,
             step
         );
-        if(speed > this.maxSpeed) {
+
+        // Cap out linear velocity at max.
+        if(velocity > this.maxVelocity) {
             vec3.normalize(this.velocity, this.velocity);
-            vec3.scale(this.velocity, this.velocity, this.maxSpeed);   
+            vec3.scale(this.velocity, this.velocity, this.maxVelocity);
+        }
+
+        // Get current angular velocity.
+        var angularVelocity = vec3.length(this.angularVelocity);
+
+        // Increase our velocity by acceleration.
+        vec3.scaleAndAdd(
+            this.angularVelocity,
+            this.angularVelocity,
+            this.angularAcceleration,
+            step
+        );
+
+        // Cap angular velocity at max.
+        if(angularVelocity > this.maxAngularVelocity) {
+            vec3.normalize(this.angularVelocity, this.angularVelocity);
+            vec3.scale(this.angularVelocity, this.angularVelocity, this.maxAngularVelocity);
         }
 
         var tempOrigin = vec3.create();
@@ -123,14 +95,28 @@ class PhysicsComponent extends EntityComponent {
             );
             for(var i = 0; i < collidables.length; i++) {
                 var collidable = collidables[i];
-                vec3.copy(
-                    this.aabb.origin,
-                    tempOrigin
-                );
-                if(this.aabb.checkCollision(collidable.aabb, transformComponent.translateToWorld(tempOrigin))) {
-                    collision = true;
-                    break;
+                if(this.aabb) {
+                    vec3.copy(
+                        this.aabb.origin,
+                        tempOrigin
+                    );
+                    if(this.aabb.checkCollision(collidable.aabb)) {
+                        collision = true;
+                        break;
+                    }
                 }
+            }
+            if(tempOrigin[Math.X] > 195 || tempOrigin[Math.X] < -195) {
+                if(this.onBoundary !== undefined) {
+                    this.onBoundary(Math.X);
+                }
+                collision = true;
+            }
+            if(tempOrigin[Math.Z] > 195 || tempOrigin[Math.Z] < -195) {
+                if(this.onBoundary !== undefined) {
+                    this.onBoundary(Math.Z);
+                }
+                collision = true;
             }
             if(!collision) {
                 vec3.copy(
@@ -146,11 +132,9 @@ class PhysicsComponent extends EntityComponent {
                 step
             );
         }
-
-        vec3.copy(
-            this.aabb.origin,
-            transformComponent.absOrigin
-        );
+        if(this.aabb) {
+            vec3.copy(this.aabb.origin, transformComponent.getWorldTranslation());
+        }
 
         vec3.scaleAndAdd(
             transformComponent.absRotation,

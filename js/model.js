@@ -1,5 +1,5 @@
 class Model {
-    constructor(glContext, indices, vertices, normals, color) {
+    constructor(glContext, indices, vertices, normals = undefined, color) {
         this.ctx = glContext;
         this.indices = indices;
         this.vertices = vertices;
@@ -7,6 +7,7 @@ class Model {
         this.color = color;
         this.vtxBuffer = glContext.createBuffer();
         this.clrBuffer = glContext.createBuffer();
+
 
         this.hasLighting = false;
 
@@ -77,8 +78,9 @@ class Model {
                 program.attributeLocation("a_color")
             );
         }
-        if(this.normals) {
+        if(this.normals && this.hasLighting) {
             {
+                //console.log(this.normals);
                 const numComponents = 3;
                 const type = this.ctx.FLOAT;
                 const normalize = false;

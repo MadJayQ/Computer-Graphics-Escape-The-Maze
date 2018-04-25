@@ -18,6 +18,7 @@
     <script src="js/renderer.js"></script>
     <script src="js/scene.js"></script>
     <script src="js/model.js"></script>
+    <script src="js/aabb.js"></script>
     <script src="js/assets.js"></script>
 
     <script src="js/components/component.js"></script>
@@ -34,6 +35,9 @@
     <script src="js/entities/rock.js"></script>
     <script src="js/entities/coin.js"></script>
     <script src="js/entities/wall.js"></script>
+    <script src="js/entities/lightemitter.js"></script>
+    <script src="js/entities/start.js"></script>
+    <script src="js/entities/finish.js"></script>
 
     <!-- Include js mesh files -->
     <script src="js/meshes/test.js"></script>
@@ -50,7 +54,11 @@
     <canvas id="glcanvas"></canvas>
     <script>
       var debug = null; //This variable exists so that we can print information about our "main class" in console without jQuery getting in our way.
-      var drawAABB = true;
+      var drawAABB = false;
+      var plight = true;
+      var dlight = true;
+      var slight = true;
+      var fog = true;
       $(document).ready(() => {
         // Setup initial AJAX settings.
         $.ajaxSetup({

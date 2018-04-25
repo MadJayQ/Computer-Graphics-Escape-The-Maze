@@ -23,6 +23,38 @@ class GameWorld extends Entity {
             this.scene.mainCameraID = ((this.scene.mainCameraID + 1) % this.scene.cameras.length);
           }
         );
+        this.inputComponent.registerEvent(
+            InputMethod.INPUT_KEYBOARD,
+            InputType.BTN_RELEASE,
+            'KeyU',
+            (event) => {
+              fog = !fog;
+            }
+        );
+        this.inputComponent.registerEvent(
+            InputMethod.INPUT_KEYBOARD,
+            InputType.BTN_RELEASE,
+            'KeyI',
+            (event) => {
+              plight = !plight;
+            }
+        );
+        this.inputComponent.registerEvent(
+            InputMethod.INPUT_KEYBOARD,
+            InputType.BTN_RELEASE,
+            'KeyO',
+            (event) => {
+              slight = !slight;
+            }
+        );
+        this.inputComponent.registerEvent(
+            InputMethod.INPUT_KEYBOARD,
+            InputType.BTN_RELEASE,
+            'KeyP',
+            (event) => {
+                dlight = !dlight;
+            }
+        );
 
     this.inputComponent.registerEvent(
           InputMethod.INPUT_KEYBOARD,
@@ -47,8 +79,31 @@ class GameWorld extends Entity {
         }
     }
 
+    checkSpotlight() {
+        var x1 = this.player.transformComponent.absOrigin[Math.X];
+        var x2 = this.patroller.transformComponent.absOrigin[Math.X];
+        var y1 = this.player.transformComponent.absOrigin[Math.Z];
+        var y2 = this.patroller.transformComponent.absOrigin[Math.Z];
+        var D = 23.0;
+
+        return Math.pow(x1 - x2, 2.0) + Math.pow(y1 - y2, 2.0) <= Math.pow(D, 2.0);
+    }
+
+    teleportPlayer() {
+        console.log(this.start.transformComponent.absOrigin);
+        vec3.copy(
+            this.player.transformComponent.absOrigin,
+            this.start.transformComponent.absOrigin
+        );
+        //this.player.transformComponent.absOrigin = this.start.transformComponent.absOrigin;
+        this.player.transformComponent.absOrigin[Math.Y] = 10;
+    }
+
     tick(dt) {
         super.tick(dt);
+        if(this.checkSpotlight()) {
+            this.teleportPlayer();
+        }
     }
 
     queryCollisionTree(ent, type = CollisionType.COLLISION_SOLID) {
