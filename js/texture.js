@@ -1,4 +1,4 @@
-class Program {
+class Texture {
     constructor(builder) {
         if(arguments.length === 1) {
             let ctx = builder.ctx;
@@ -19,9 +19,18 @@ class Program {
                 }
             });
         } else {
-            console.error("[GL PROGRAM]: ERROR CONSTRUCTING GL PROGRAM! INVALID BUILDER");
+            console.error("[TEXTURE]: ERROR CONSTRUCTING TEXTURE! INVALID BUILDER");
             return undefined;
         }
+    }
+    getTexture() {
+        return this._texture;
+    }
+    bind() {
+        var gl = this._ctx;
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this._texture);
+
     }
     static get Builder() {
         /*
@@ -33,7 +42,32 @@ class Program {
             constructor(glContext) {
                 this.ctx = glContext;
             }
-            fromPNG(src) {
+            fromHTMLImg(name) {
+                this.texture = this.ctx.createTexture();
+                this.ctx.bindTexture(this.ctx.TEXTURE_2D, this.texture);
+                var img = document.getElementById(name);
+                this.ctx.texImage2D(
+                    this.ctx.TEXTURE_2D, 0, this.ctx.RGBA, this.ctx.RGBA, this.ctx.UNSIGNED_BYTE,
+                    img
+                );
+                this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_MIN_FILTER, this.ctx.LINEAR);
+                if (Math.isPowerOf2(img.width) && Math.isPowerOf2(img.height)) {
+                    console.log("POW 2");
+                   // Yes, it's a power of 2. Generate mips.
+                   this.ctx.generateMipmap(this.ctx.TEXTURE_2D);
+                   this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_S, this.ctx.REPEAT);
+                   this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_T, this.ctx.REPEAT);
+                } else {
+                   // No, it's not a power of 2. Turn of mips and set
+                   // wrapping to clamp to edge
+                   this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_S, this.ctx.CLAMP_TO_EDGE);
+                   this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_WRAP_T, this.ctx.CLAMP_TO_EDGE);
+                   this.ctx.texParameteri(this.ctx.TEXTURE_2D, this.ctx.TEXTURE_MIN_FILTER, this.ctx.LINEAR);
+                }
+                this.ctx.bindTexture(this.ctx.TEXTURE_2D, null);
+                return this;
+            }
+            fromPNG(src, onLoad) {
                 this.texture = this.ctx.createTexture();
                 this.ctx.bindTexture(this.ctx.TEXTURE_2D, this.texture);
                 this.ctx.texImage2D(
@@ -50,13 +84,16 @@ class Program {
                 var gl = this.ctx;
                 var texture = this.texture;
                 image.addEventListener('load', () => {
+                    console.log("Texture loaded");
                     gl.bindTexture(gl.TEXTURE_2D, texture);
                     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
                     gl.generateMipmap(gl.TEXTURE_2D);
+                    onLoad();
                 });
+                return this;
             }
             build() {
-                return new Program(this);
+                return new Texture(this);
             }
         }
         return Builder;

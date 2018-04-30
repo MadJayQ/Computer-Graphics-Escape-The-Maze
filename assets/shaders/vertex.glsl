@@ -46,7 +46,10 @@ precision mediump float;
 attribute vec4 a_position;
 attribute vec3 a_color;
 attribute vec3 a_normal;
+attribute vec2 a_texCoord;
 
+uniform vec3 u_patrolPos;
+uniform vec3 u_patrolRot;
 uniform vec3 u_viewWorldPos;
 uniform mat4 u_viewMatrix;
 uniform mat4 u_modelMatrix;
@@ -55,6 +58,8 @@ uniform mat4 u_normalTransform;
 varying vec3 v_lighting;
 varying vec3 v_normal;
 varying vec4 v_pos;
+
+varying vec2 v_texCoord;
 
 
 uniform bool u_ignoreLighting;
@@ -68,5 +73,6 @@ void main()
     v_normal = a_normal;
     v_lighting = a_color;
     v_pos = a_position;
+    v_texCoord = a_texCoord;
     gl_Position = u_projectionMatrix * u_viewMatrix * u_modelMatrix * a_position;
 }

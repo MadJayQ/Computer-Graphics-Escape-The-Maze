@@ -37,7 +37,7 @@ class PhysicsComponent extends EntityComponent {
     }
 
     physicsSimulate(step) {
-        if(!this.owner.hasComponent(ComponentID.COMPONENT_TRANSFORM)) {
+                if(!this.owner.hasComponent(ComponentID.COMPONENT_TRANSFORM)) {
             return;
         }
         var transformComponent = this.owner.getComponent(ComponentID.COMPONENT_TRANSFORM);
@@ -81,10 +81,13 @@ class PhysicsComponent extends EntityComponent {
             vec3.normalize(this.angularVelocity, this.angularVelocity);
             vec3.scale(this.angularVelocity, this.angularVelocity, this.maxAngularVelocity);
         }
+        if(this.aabb) {
+            vec3.copy(this.aabb.origin, transformComponent.getWorldTranslation());
+        }
 
         var tempOrigin = vec3.create();
         var collision = false;
-        if(this.isMoving() && this.collisionType == CollisionType.COLLISION_SOLID) {
+        if(this.aabb && this.isMoving() && this.collisionType == CollisionType.COLLISION_SOLID) {
             vec3.copy(tempOrigin, transformComponent.absOrigin);
             var collidables = this.owner.getGameWorld().queryCollisionTree(this.owner);
             vec3.scaleAndAdd(
@@ -95,28 +98,14 @@ class PhysicsComponent extends EntityComponent {
             );
             for(var i = 0; i < collidables.length; i++) {
                 var collidable = collidables[i];
-                if(this.aabb) {
-                    vec3.copy(
-                        this.aabb.origin,
-                        tempOrigin
-                    );
-                    if(this.aabb.checkCollision(collidable.aabb)) {
-                        collision = true;
-                        break;
-                    }
+                vec3.copy(
+                    this.aabb.origin,
+                    tempOrigin
+                );
+                if(this.aabb.checkCollision(collidable.aabb)) {
+                    collision = true;
+                    break;
                 }
-            }
-            if(tempOrigin[Math.X] > 195 || tempOrigin[Math.X] < -195) {
-                if(this.onBoundary !== undefined) {
-                    this.onBoundary(Math.X);
-                }
-                collision = true;
-            }
-            if(tempOrigin[Math.Z] > 195 || tempOrigin[Math.Z] < -195) {
-                if(this.onBoundary !== undefined) {
-                    this.onBoundary(Math.Z);
-                }
-                collision = true;
             }
             if(!collision) {
                 vec3.copy(
@@ -132,6 +121,7 @@ class PhysicsComponent extends EntityComponent {
                 step
             );
         }
+
         if(this.aabb) {
             vec3.copy(this.aabb.origin, transformComponent.getWorldTranslation());
         }

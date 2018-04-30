@@ -16,6 +16,9 @@ class _GlobalVars_ //Internal class
         //TODO(Zach): Look into maybe putting this somewhere else? I think it's fine here but it also feels kinda hacky
         this.clientWidth = 0; //We're going to go ahead and store our client width & height in the global vars
         this.clientHeight = 0;
+        this.spawnX = 0;
+        this.spawnY = 0;
+        this.spawnYaw = 0;
     }
 
     timeToTicks(time) {

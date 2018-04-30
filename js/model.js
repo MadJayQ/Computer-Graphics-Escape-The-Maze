@@ -18,6 +18,13 @@ class Model {
         this.reload();
     }
 
+    setTexture(src, texCoords) {
+        this.texture = src;
+        this.texCoords = texCoords;
+        console.log(texCoords);
+        this.reload();
+    }
+
     reload() {
         this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, this.vtxBuffer);
         this.ctx.bufferData(this.ctx.ARRAY_BUFFER, new Float32Array(this.vertices), this.ctx.STATIC_DRAW);
@@ -35,6 +42,13 @@ class Model {
             this.normalBuffer = this.ctx.createBuffer();
             this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, this.normalBuffer);
             this.ctx.bufferData(this.ctx.ARRAY_BUFFER, new Float32Array(this.normals), this.ctx.STATIC_DRAW);
+        }
+        if(this.texCoords) {
+            console.log("YO");
+            this.hasTexture = true;
+            this.texCoordBuffer = this.ctx.createBuffer();
+            this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, this.texCoordBuffer);
+            this.ctx.bufferData(this.ctx.ARRAY_BUFFER, new Float32Array(this.texCoords), this.ctx.STATIC_DRAW);
         }
     }
 
@@ -99,6 +113,39 @@ class Model {
                     program.attributeLocation("a_normal")
                 );
             }
+        }
+        if(this.texCoords && this.hasTexture) {
+            const numComponents = 2;
+            const type = this.ctx.FLOAT;
+            const normalize = false;
+            const stride = 0;
+            const offset = 0;
+            this.ctx.bindBuffer(this.ctx.ARRAY_BUFFER, this.texCoordBuffer);
+            this.ctx.vertexAttribPointer(
+                program.attributeLocation("a_texCoord"),
+                numComponents,
+                type,
+                normalize,
+                stride,
+                offset
+            );
+            this.ctx.enableVertexAttribArray(
+                program.attributeLocation("a_texCoord")
+            );
+            this.texture.bind();
+            this.ctx.uniform1i(
+                program.uniformLocation("u_texture"),
+                0
+            );
+            this.ctx.uniform1i(
+                program.uniformLocation("u_hasTexture"),
+                1
+            );
+        } else {
+            this.ctx.uniform1i(
+                program.uniformLocation("u_hasTexture"),
+                0
+            );
         }
     }
 };

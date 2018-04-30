@@ -18,6 +18,7 @@
     <script src="js/renderer.js"></script>
     <script src="js/scene.js"></script>
     <script src="js/model.js"></script>
+    <script src="js/texture.js"></script>
     <script src="js/aabb.js"></script>
     <script src="js/assets.js"></script>
 
@@ -47,18 +48,25 @@
     <script src="js/meshes/ground.js"></script>
     <script src="js/meshes/aabb.js"></script>
 
+    <script src="js/maze.js"></script>
+
     <!-- Include stylesheets -->
     <link rel="stylesheet" href="css/style.css">
   </head>
   <body>
+    <img id="texture0" class="texture-src" src="assets/texture/texture0.png"/>
+    <img id="texture1" class="texture-src" src="assets/texture/texture1.png"/>
+    <img id="texture2" class="texture-src" src="assets/texture/texture2.png"/>
+    <img id="texture3" class="texture-src" src="assets/texture/texture3.png"/>
     <canvas id="glcanvas"></canvas>
     <script>
       var debug = null; //This variable exists so that we can print information about our "main class" in console without jQuery getting in our way.
-      var drawAABB = false;
+      var drawAABB = true;
       var plight = true;
       var dlight = true;
       var slight = true;
-      var fog = true;
+      var lighting = true;
+      var fog = false;
       $(document).ready(() => {
         // Setup initial AJAX settings.
         $.ajaxSetup({

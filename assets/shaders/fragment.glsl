@@ -2,6 +2,7 @@ precision mediump float;
 varying vec3 v_lighting;
 varying vec3 v_normal;
 varying vec4 v_pos;
+varying vec2 v_texCoord;
 
 
 uniform vec3 u_viewWorldPos;
@@ -11,12 +12,16 @@ uniform mat4 u_projectionMatrix;
 uniform mat4 u_normalTransform;
 
 uniform vec3 u_patrolPos;
+uniform vec3 u_patrolRot;
 
 uniform bool u_ignoreLighting;
 uniform bool u_pointLights;
 uniform bool u_spotLight;
 uniform bool u_directionalLight;
 uniform bool u_fog;
+
+uniform sampler2D u_texture;
+uniform bool u_hasTexture;
 
 struct PLight {
     vec4 position;
@@ -147,14 +152,14 @@ void main()
     src5.diffuse = vec3(0.38, 0.18, 0.40);
     src5.specular = vec3(1.0, 1.0, 1.0);
     src5.falloff = 2.0;
-    src5.intensity = 2.0;
+    src5.intensity = 0.25;
     src5.radius = 50.0;
 
     SLight spot;
-    spot.position = vec4(vec3(u_patrolPos), 1.0);
-    spot.diffuse = vec3(1.0, 1.0, 1.0);
+    spot.position = vec4(256.0 + 2.0, 125.0, 368.0 - 3.2, 1.0);
+    spot.diffuse = vec3(0.1, 1.0, 0.1);
     spot.direction = vec3(0.0, -1.0, 0.0);
-    spot.limit = 5.0;
+    spot.limit = 50.0;
 
     DLight dlight;
     dlight.position = vec4(0.0, 50.0, 50.0, 1.0);
@@ -165,6 +170,10 @@ void main()
     mat.diffuse = vec3(1.0, 1.0, 1.0);
     mat.specular = vec3(0.8, 0.8, 0.8);
     mat.shine = 100.0;
+
+    if(u_hasTexture) {
+        mat.ambient = vec3(texture2D(u_texture, v_texCoord));
+    }
 
     if(!u_ignoreLighting) {
         vec4 p = u_modelMatrix * v_pos;

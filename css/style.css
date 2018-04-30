@@ -11,3 +11,7 @@ html, body {
   height: 100vh;
   display: block;
 }
+
+.texture-src {
+  display: none;
+}

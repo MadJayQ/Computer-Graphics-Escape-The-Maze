@@ -1,6 +1,7 @@
 class _Assets_ {
     constructor() {
         this.models = new Map();
+        this.textures = new Map();
     }
 
     addModel(gl, mesh, name) {
@@ -11,6 +12,14 @@ class _Assets_ {
             (mesh.normals) ? mesh.normals() : undefined,
             mesh.color()
         );
+    }
+    addTexture(gl, src, name) {
+        var t = new Texture.Builder(gl).fromHTMLImg(src);
+        this.textures[name] = t.build();
+    }
+
+    getTexture(name) {
+        return this.textures[name];
     }
 
     getModel(name) {

@@ -89,10 +89,44 @@ var CoinMesh = () => {
         -0.2,  0.2,  0.2,
         -0.2,  0.2, -0.2,
     ];
+
+    var uvs = [
+              // Front
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Front
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Front
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Front
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Front
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+      // Front
+      0.0,  0.0,
+      1.0,  0.0,
+      1.0,  1.0,
+      0.0,  1.0,
+    ];
     return {
         indices: () => { return indices; },
         vertices: () => { return vertices; },
         normals: () => { return normals; },
+        texCoords: () => {return uvs;},
         color: (portalColor) => {
             var c = [];
             for(var j = 0; j < vertices.length / 3; ++j) {

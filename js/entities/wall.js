@@ -33,3 +33,4 @@ EntityType.ENTITY_WALL.construction = (owner) => {
         owner
     );
 }
+

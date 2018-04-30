@@ -64,11 +64,32 @@ class App {
     
     
     var assets = Assets.getInstance();
-    assets.addModel(this.gl, TreeMesh(), "tree");
-    assets.addModel(this.gl, RockMesh(), "rock");
-    assets.addModel(this.gl, CoinMesh(), "coin");
     assets.addModel(this.gl, TestMesh(), "test");
-    assets.addModel(this.gl, GroundMesh(2000, 450), "ground");
+    assets.addModel(this.gl, GroundMesh(2000), "ground");
+    assets.addModel(this.gl, TestMesh(), "wall");
+    assets.addModel(this.gl, CoinMesh(), "enemy");
+
+    assets.addTexture(this.gl, "texture0", "texture0");
+    assets.addTexture(this.gl, "texture1", "texture1");
+    assets.addTexture(this.gl, "texture2", "texture2");
+    assets.addTexture(this.gl, "texture3", "texture3");
+    assets.getModel("test").setTexture(
+      assets.getTexture("texture0"),
+      TestMesh().texCoords()
+    );
+    assets.getModel("wall").setTexture(
+      assets.getTexture("texture1"),
+      TestMesh().texCoords()
+    )
+    assets.getModel("ground").setTexture(
+      assets.getTexture("texture2"),
+      GroundMesh(2000).texCoords()
+    );
+
+    assets.getModel("enemy").setTexture(
+      assets.getTexture("texture3"),
+      CoinMesh().texCoords()
+    );
     
     // Create game world entity.
     this.gameworld = new Entity.Factory(null).ofType(EntityType.ENTITY_GAMEWORLD);
@@ -81,6 +102,7 @@ class App {
     this.gameworld.player = new Entity.Factory(this.gameworld).ofType(EntityType.ENTITY_PLAYER);
     this.gameworld.player.physicsComponent.aabb = new AABB(this.gameworld.player, 5, 20, 5);
     this.gameworld.player.physicsComponent.aabb.translation[Math.Y] = 0;
+    this.gameworld.player.transformComponent.absOrigin = vec3.fromValues(25, 10, 25);
     // Create camera entity.
     this.gameworld.player.camera = new Entity.Factory(this.gameworld.player).ofType(EntityType.ENTITY_CAMERA);
     this.gameworld.player.camera.boomAngle = [0, 0];
@@ -95,50 +117,72 @@ class App {
       ent.transformComponent.absScale = vec3.fromValues(scalex, scaley, scalez);
       return ent;
     };
-    
-    var coin = spawnEnt(0, -10, EntityType.ENTITY_COIN, "coin", 5, 5, 5);
-    coin.transformComponent.absOrigin[Math.Y] = 10;
-    coin.physicsComponent.aabb = new AABB(coin, 5, 5, 5);
-    coin.physicsComponent.aabb.origin = vec3.fromValues(0, 0, 0);
-    coin.physicsComponent.aabb.translation = vec3.fromValues(0, 0, 0);
-    coin.physicsComponent.angularVelocity[Math.YAW] = Math.randInt(30, 75);
 
-    var wall = spawnEnt(-200, 0, EntityType.ENTITY_WALL, "test", 1, 50, 1000);
-    wall.transformComponent.absOrigin[Math.Y] = 10;
+    var maze = Maze().data();
 
-    wall = spawnEnt(200, 0, EntityType.ENTITY_WALL, "test", 1, 50, 1000);
-    wall.transformComponent.absOrigin[Math.Y] = 10;
+    var spawnPos = vec2.fromValues(0, 0);
+    var yaw = 0;
 
+    for(var i = 0; i < maze.length; i++) {
+      for(var j = 0; j < maze[i].length; j++) {
+        switch(maze[i][j]) {
+          case 0: break;
+          case 1: {
+            var model = (i == 0 || i == maze.length || j == 0 || j == maze[i].length) ? "wall" : "test";
+            var ent = spawnEnt(i * 16, j * 16, EntityType.ENTITY_COIN, model, 20, 20, 20);
+            ent.transformComponent.absOrigin[Math.Y] = 12;
+            ent.physicsComponent.aabb = new AABB(ent, 16, 16, 16);
+            ent.physicsComponent.aabb.translation = vec3.fromValues(4, -4, -4);
+            break;
+          }
+          case 8: spawnPos = vec2.fromValues(i * 16, j * 16); yaw = 0; break;
+          case 4: spawnPos = vec2.fromValues(i * 16, j * 16); yaw = 90; break;
+          case 6: spawnPos = vec2.fromValues(i * 16, j * 16); yaw = 180; break;
+          case 2: spawnPos = vec2.fromValues(i * 16, j * 16); yaw = 180; break;
+          case 3: {
+            var ent = spawnEnt(i * 16, j * 16, EntityType.ENTITY_TREE, "enemy", 3, 3, 3);
+            ent.transformComponent.absOrigin[Math.Y] = 10;
+            ent.physicsComponent.aabb = new AABB(ent, 1, 1, 1);
+            ent.physicsComponent.aabb.translation = vec3.fromValues(0, 0, 0);
+            break;
+          }
+          case 7: {
+            var ent = spawnEnt(i * 16, j * 16, EntityType.ENTITY_TREE, "enemy", 3, 3, 3);
+            ent.transformComponent.absOrigin[Math.Y] = 10;
+            ent.physicsComponent.aabb = new AABB(ent, 1, 1, 1);
+            ent.physicsComponent.aabb.translation = vec3.fromValues(0, 0, 0);
+            break;
+          }
+          case 9: {
+            var ent = spawnEnt(i * 16, j * 16, EntityType.ENTITY_TREE, "enemy", 3, 3, 3);
+            ent.transformComponent.absOrigin[Math.Y] = 10;
+            ent.physicsComponent.aabb = new AABB(ent, 1, 1, 1);
+            ent.physicsComponent.aabb.translation = vec3.fromValues(0, 0, 0);
+            break;
+          }
+          case 5: {
+            var ent = spawnEnt(i * 16, j * 16, EntityType.ENTITY_FINISH, null, 20, 20, 20);
+            ent.transformComponent.absOrigin[Math.Y] = 12;
+            ent.physicsComponent.aabb = new AABB(ent, 16, 16, 16);
+            ent.physicsComponent.aabb.translation = vec3.fromValues(4, -4, -4);
+            console.log(i * 16, j * 16);
 
-    wall = spawnEnt(0, 200, EntityType.ENTITY_WALL, "test", 1, 50, 1000);
-    wall.transformComponent.absOrigin[Math.Y] = 10;
-    wall.transformComponent.absRotation[Math.YAW] = 90;
-
-    wall = spawnEnt(0, -200, EntityType.ENTITY_WALL, "test", 1, 50, 1000);
-    wall.transformComponent.absOrigin[Math.Y] = 10;
-    wall.transformComponent.absRotation[Math.YAW] = 90;
-
-    for(var i = 0; i < 75; i++) {
-      var tx = Math.randInt(-200, 200);
-      var tz = Math.randInt(-200, 200);
-
-      var tree = spawnEnt(tx, tz, EntityType.ENTITY_TREE, "tree", 5, 5, 5);
-      tree.transformComponent.absOrigin[Math.Y] = 10;
-      tree.physicsComponent.aabb = new AABB(tree, 5, 25, 5);
-      tree.physicsComponent.aabb.origin = vec3.fromValues(tx, 0, tz);
-      tree.physicsComponent.aabb.translation = vec3.fromValues(0, 10, 0);
+          }
+          default: break;
+        }
+      }
     }
 
+    this.gameworld.player.transformComponent.absOrigin[Math.X] = spawnPos[Math.X];
+    this.gameworld.player.transformComponent.absOrigin[Math.Z] = spawnPos[Math.Y];
+    this.gameworld.player.transformComponent.absRotation[Math.YAW] = yaw;
 
-    this.gameworld.patroller = spawnEnt(75, 0, EntityType.ENTITY_LIGHTEMITTER, "test", 50, 50, 50);
-    this.gameworld.patroller.transformComponent.absOrigin[Math.Y] = 550;
 
-    this.gameworld.start = spawnEnt(0, 195, EntityType.ENTITY_START, "test", 0, 0, 0);
-    this.gameworld.finish = spawnEnt(0, -195, EntityType.ENTITY_FINISH, "test", 5, 5, 5);
-    this.gameworld.finish.transformComponent.absOrigin[Math.Y] = 10;
-    this.gameworld.finish.physicsComponent.aabb = new AABB(this.gameworld.finish, 5, 25, 5);
-    this.gameworld.teleportPlayer();
-    
+    var globals = GlobalVars.getInstance();
+    globals.spawnX = spawnPos[Math.X];
+    globals.spawnY = spawnPos[Math.Y];
+    globals.spawnYaw = yaw;
+        
     return AppStatus.STATUS_OK;
   }
   

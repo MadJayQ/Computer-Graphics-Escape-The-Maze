@@ -61,7 +61,7 @@ class GameWorld extends Entity {
           InputType.BTN_RELEASE,
           'KeyQ',
           (event) => {
-            this.children[0].camera.boomAngle += 30;
+            lighting = !lighting;
           }
         );
     }
@@ -101,9 +101,6 @@ class GameWorld extends Entity {
 
     tick(dt) {
         super.tick(dt);
-        if(this.checkSpotlight()) {
-            this.teleportPlayer();
-        }
     }
 
     queryCollisionTree(ent, type = CollisionType.COLLISION_SOLID) {

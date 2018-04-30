@@ -64,14 +64,15 @@ class Renderer {
             camPos[Math.Y],
             camPos[Math.Z]
         );
-        var patrolPos = gameworld.patroller.transformComponent.absOrigin;
+        
+        var patrolPos = gameworld.player.transformComponent.absOrigin;
         this.ctx.uniform3f(
             this.program.uniformLocation("u_patrolPos"),
             patrolPos[Math.X],
             patrolPos[Math.Y],
             patrolPos[Math.Z]
         );
-
+    
         this.ctx.uniform1i(
             this.program.uniformLocation("u_pointLights"),
             plight
@@ -87,6 +88,10 @@ class Renderer {
         this.ctx.uniform1i(
             this.program.uniformLocation("u_fog"),
             fog
+        );
+        this.ctx.uniform1i(
+            this.program.uniformLocation("u_ignoreLighting"),
+            1
         );
 
         this.recursiveRender(gameworld);

@@ -17,9 +17,7 @@ class AABB  {
 
     draw(program, gl) {
         if(!this.model) {
-            console.log(program);
             this.model = new Model(gl, this.indices, this.vertices, undefined, this.color);
-            console.log(this.model);
         }
         gl.uniform1i(
             program.uniformLocation("u_ignoreLighting"),
@@ -35,7 +33,7 @@ class AABB  {
         );
         mat4.fromTranslation(transform, finalPosition);
         if(this.owner.type == EntityType.ENTITY_PLAYER) {
-            alert("yo");
+            //alert("yo");
             //console.log(this.origin, this.owner.transformComponent);
         }
         gl.uniformMatrix4fv(
@@ -52,8 +50,18 @@ class AABB  {
         }
     }
     checkCollision(other) {
-        var center = this.origin;
-        var otherCenter = other.origin;
+        var center = vec3.create();
+        vec3.add(
+            center,
+            this.origin,
+            this.translation
+        );
+        var otherCenter = vec3.create();
+        vec3.add(
+            otherCenter,
+            other.origin,
+            other.translation
+        );
 
         var otherMin = [otherCenter[0] - other.offsetX, otherCenter[1] - other.offsetY, otherCenter[2] - other.offsetZ];
         var otherMax = [otherCenter[0] + other.offsetX, otherCenter[1] + other.offsetY, otherCenter[2] + other.offsetZ];

@@ -134,6 +134,7 @@ var TreeMesh = () => {
         indices: () => { return indices; },
         vertices: () => { return vertices; },
         normals: () => { return normals; },
+        texCoords: () => { return undefined; },
         color: (portalColor) => {
             var c = [];
             for(var j = 0; j < vertices.length / 3; ++j) {

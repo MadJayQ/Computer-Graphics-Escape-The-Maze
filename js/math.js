@@ -33,6 +33,11 @@ Math.sinCos = (sin, cos, rad) => {
   sin = Math.sin(rad);
   cos = Math.cos(rad);
 }
+
+Math.isPowerOf2 = (value) => {
+  return (value & (value - 1)) == 0;
+}
+
 Math.angleVectors = (view, forward, right, up) => {
   var sr, sp, sy, cr, cp, cy;
 
